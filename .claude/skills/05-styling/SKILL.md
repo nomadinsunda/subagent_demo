@@ -1,3 +1,9 @@
+---
+name: styling
+description: Tailwind CSS v4 + daisyUI v5 UI 구현 패턴. daisyUI 컴포넌트 클래스 목록, 레이아웃 패턴, 시맨틱 색상 시스템, 반응형 모바일 퍼스트, 금지 패턴. UI 컴포넌트 작업 시 참조.
+user-invocable: false
+---
+
 # 05 · 스타일링 (Tailwind v4 + daisyUI v5)
 
 이 프로젝트의 UI 구현 패턴과 daisyUI 컴포넌트 사용 방법을 정의한다.  

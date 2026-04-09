@@ -1,3 +1,9 @@
+---
+name: auto-doc-sync
+description: 문서 자동 동기화 규칙(CLAUDE.md Rule 11~13). docs/*.md 업데이트 트리거 조건, 작업 전 필독 순서, 변경 보고 형식, 신규 도메인 docs 생성 기준. 비즈니스 로직 변경 시 참조.
+user-invocable: false
+---
+
 # 07 · 문서 자동 동기화 (Auto Doc Sync)
 
 CLAUDE.md Rules 12~14의 구체적 실행 방법을 정의한다.  

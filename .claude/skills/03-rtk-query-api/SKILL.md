@@ -1,3 +1,9 @@
+---
+name: rtk-query-api
+description: RTK Query API 패턴. 단일 createApi + injectEndpoints 분리, providesTags/invalidatesTags 태그 전략, 훅 명명 규칙, store.js 등록 필수. API 엔드포인트 추가·수정 시 참조.
+user-invocable: false
+---
+
 # 03 · RTK Query API 패턴
 
 새로운 API 엔드포인트를 추가하거나 수정할 때 반드시 따르는 패턴을 정의한다.  
@@ -8,7 +14,7 @@
 ## 핵심 원칙
 
 1. **단일 createApi** — `src/api/apiSlice.js`에서만 `createApi()` 호출
-2. **injectEndpoints 분리** — 도메인별로 `{domain}Api.js`를 별도 파일로 작성
+2. **injectEndpoints 분리** — 도메인별로 `src/features/{domain}/{domain}Api.js`를 별도 파일로 작성
 3. **withReauth 필수** — `baseQuery`는 반드시 `withReauth`로 감싸야 함 (Rule 6)
 4. **No Axios** — 모든 HTTP 통신은 RTK Query만 사용 (Rule 1)
 
@@ -18,18 +24,21 @@
 
 ```
 src/api/
-├── apiSlice.js        ← createApi + withReauth (수정 금지 영역)
-├── authApi.js         ← auth 엔드포인트 (injectEndpoints)
-├── productsApi.js
-├── ordersApi.js
-├── reviewsApi.js
-├── pointsApi.js
-├── inquiriesApi.js
-├── usersApi.js
+├── apiSlice.js        ← createApi + withReauth (인프라 전용, 수정 금지)
 └── mockBaseQuery.js   ← Mock 전용 baseQuery
+
+src/features/{domain}/
+└── {domain}Api.js     ← injectEndpoints (도메인 API, 예시)
+    ├── features/auth/authApi.js
+    ├── features/products/productsApi.js
+    ├── features/cart/cartApi.js
+    ├── features/orders/ordersApi.js
+    ├── features/reviews/reviewsApi.js
+    ├── features/inquiries/inquiriesApi.js
+    └── features/user/usersApi.js, pointsApi.js
 ```
 
-새 도메인 추가 시 `{domain}Api.js` 파일 하나만 생성 후 `store.js`에 import 추가.
+새 도메인 추가 시 `src/features/{domain}/{domain}Api.js` 생성 후 `store.js`에 import 추가.
 
 ---
 

@@ -1,3 +1,9 @@
+---
+name: auth-security
+description: HttpOnly 쿠키 기반 JWT 인증 구현 패턴. withReauth 401 자동 갱신 래퍼, AuthInitializer FOUC 방지, ProtectedRoute, OAuth2 소셜 로그인 state nonce 패턴. 인증 관련 작업 시 참조.
+user-invocable: false
+---
+
 # 02 · 인증 & 보안 (Auth & Security)
 
 `docs/auth.md` 명세를 코드로 구현할 때의 구체적 패턴을 정의한다.

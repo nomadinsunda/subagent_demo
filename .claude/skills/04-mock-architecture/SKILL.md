@@ -1,3 +1,9 @@
+---
+name: mock-architecture
+description: Mock 개발 환경 구조와 운용 규칙. mockBaseQuery URL 라우팅, 가변/불변 데이터 let 변수 관리, 새 도메인 추가 6단계 절차, 백엔드 전환 방법. 새 도메인 추가 시 참조.
+user-invocable: false
+---
+
 # 04 · Mock 아키텍처
 
 백엔드 없이 개발하는 현재 단계에서의 Mock 시스템 구조와 운용 규칙을 정의한다.  

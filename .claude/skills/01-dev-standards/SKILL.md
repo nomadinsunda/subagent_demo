@@ -1,3 +1,9 @@
+---
+name: dev-standards
+description: 멍샵 개발 표준. 기술 스택 고정값, Pure JS 규칙, RTK Query 전용 HTTP, Vite 환경변수, 보안 금지사항(토큰 저장·OAuth Secret), SPA 네비게이션 패턴. 모든 작업 시작 전 참조.
+user-invocable: false
+---
+
 # 01 · 개발 표준 (Dev Standards)
 
 모든 작업 시작 전 이 문서를 기준으로 기술 스택과 불변 규칙을 확인한다.  
