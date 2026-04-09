@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark;
+}
+
+@layer base {
+  :root {
+    --color-primary: oklch(55% 0.2 250);
+  }
+}

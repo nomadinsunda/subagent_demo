@@ -1,0 +1,76 @@
+export const mockOrders = [
+  {
+    id: 1,
+    userId: 1,
+    status: 'delivered',
+    items: [
+      {
+        productId: 1,
+        name: '오리진 성견용 프리미엄 사료 2kg',
+        price: 28000,
+        quantity: 1,
+        imageUrl: 'https://picsum.photos/seed/dog1/400/300',
+      },
+      {
+        productId: 13,
+        name: '종합 비타민 영양제 60정',
+        price: 21250,
+        quantity: 1,
+        imageUrl: 'https://picsum.photos/seed/dog13/400/300',
+      },
+    ],
+    shippingAddress: {
+      recipient: '홍길동',
+      phone: '010-1234-5678',
+      zipCode: '06234',
+      address: '서울특별시 강남구 테헤란로 123',
+      detailAddress: '101동 202호',
+    },
+    payment: {
+      method: 'card',
+      amount: 49250,
+    },
+    pointsUsed: 0,
+    pointsEarned: 492,
+    shippingFee: 0,
+    createdAt: '2025-03-10T14:22:00Z',
+    updatedAt: '2025-03-13T11:00:00Z',
+  },
+  {
+    id: 2,
+    userId: 1,
+    status: 'paid',
+    items: [
+      {
+        productId: 8,
+        name: '방수 레인코트 (전 사이즈)',
+        price: 12600,
+        quantity: 1,
+        imageUrl: 'https://picsum.photos/seed/dog8/400/300',
+      },
+      {
+        productId: 10,
+        name: '내추럴 코튼 로프 장난감 세트',
+        price: 9000,
+        quantity: 2,
+        imageUrl: 'https://picsum.photos/seed/dog10/400/300',
+      },
+    ],
+    shippingAddress: {
+      recipient: '홍길동',
+      phone: '010-1234-5678',
+      zipCode: '06234',
+      address: '서울특별시 강남구 테헤란로 123',
+      detailAddress: '101동 202호',
+    },
+    payment: {
+      method: 'kakao_pay',
+      amount: 33600,
+    },
+    pointsUsed: 1000,
+    pointsEarned: 336,
+    shippingFee: 3000,
+    createdAt: '2025-04-05T09:11:00Z',
+    updatedAt: '2025-04-05T09:11:00Z',
+  },
+]
