@@ -59,3 +59,21 @@
 ```
 /cart  →  CartPage (ProtectedRoute — 비로그인 시 /login 리다이렉트)
 ```
+
+## 에러 처리
+
+### Query 에러
+
+| 상황 | 처리 |
+|---|---|
+| 장바구니 목록 조회 실패 | `ErrorState` 컴포넌트 + "다시 시도" 버튼 (`refetch`) |
+
+### Mutation 에러
+
+| 작업 | 실패 시 처리 |
+|---|---|
+| 수량 변경 (`updateItem`) | Toast "수량 변경에 실패했습니다" (error) |
+| 항목 삭제 (`removeItem`) | Toast "상품 삭제에 실패했습니다" (error) |
+| 전체 비우기 (`clearCart`) | Toast "장바구니 비우기에 실패했습니다" (error) |
+
+- 삭제·전체 비우기는 `confirm()` 확인 없이 즉시 실행 (실수 UX는 Toast로 대응)

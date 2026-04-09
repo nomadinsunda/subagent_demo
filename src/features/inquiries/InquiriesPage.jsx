@@ -5,45 +5,76 @@ import {
   useDeleteInquiryMutation,
 } from './inquiriesApi'
 import Spinner from '../../shared/components/Spinner'
+import ErrorState from '../../shared/components/ErrorState'
+import Toast from '../../shared/components/Toast'
+import { useToast } from '../../shared/hooks/useToast'
 import { formatDate } from '../../shared/utils/formatters'
 import { INQUIRY_TYPE_LABEL } from '../../shared/utils/constants'
 
 const EMPTY_FORM = { type: 'etc', title: '', content: '', isSecret: false }
 
 export default function InquiriesPage() {
-  const { data: inquiries = [], isLoading } = useGetMyInquiriesQuery()
+  const { data: inquiries = [], isLoading, isError, refetch } = useGetMyInquiriesQuery()
   const [createInquiry, { isLoading: isSubmitting }] = useCreateInquiryMutation()
   const [deleteInquiry] = useDeleteInquiryMutation()
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [formErrors, setFormErrors] = useState({})
   const [openId, setOpenId] = useState(null)
+  const { toasts, toast } = useToast()
+
+  const validate = () => {
+    const errors = {}
+    if (form.title.length < 5) errors.title = '제목을 5자 이상 입력해주세요'
+    if (form.content.length < 10) errors.content = '내용을 10자 이상 입력해주세요'
+    return errors
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (form.title.length < 5) return alert('제목을 5자 이상 입력해주세요')
-    if (form.content.length < 10) return alert('내용을 10자 이상 입력해주세요')
-    await createInquiry(form)
-    setForm(EMPTY_FORM)
-    setShowForm(false)
+    const errors = validate()
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
+      return
+    }
+    setFormErrors({})
+    const result = await createInquiry(form)
+    if (result.error) {
+      toast('문의 등록에 실패했습니다. 다시 시도해 주세요.', 'error')
+    } else {
+      setForm(EMPTY_FORM)
+      setShowForm(false)
+      toast('문의가 등록되었습니다', 'success')
+    }
   }
 
   const handleDelete = async (id) => {
     if (!confirm('문의를 삭제하시겠습니까?')) return
-    await deleteInquiry(id)
+    const result = await deleteInquiry(id)
+    if (result.error) {
+      toast('문의 삭제에 실패했습니다', 'error')
+    } else {
+      if (openId === id) setOpenId(null)
+    }
   }
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <Toast toasts={toasts} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">문의 내역</h1>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary btn-sm" onClick={() => {
+          setShowForm(!showForm)
+          setFormErrors({})
+        }}>
           {showForm ? '취소' : '+ 문의하기'}
         </button>
       </div>
 
-      {/* 문의 작성 폼 */}
       {showForm && (
         <form onSubmit={handleSubmit} className="card bg-base-200 p-5 space-y-3">
           <h2 className="font-bold">새 문의 작성</h2>
@@ -56,24 +87,39 @@ export default function InquiriesPage() {
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
-          <input
-            type="text"
-            className="input input-bordered input-sm w-full"
-            placeholder="제목을 입력하세요 (5자 이상, 최대 100자)"
-            value={form.title}
-            maxLength={100}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            required
-          />
-          <textarea
-            className="textarea textarea-bordered w-full"
-            placeholder="문의 내용을 입력하세요 (10자 이상, 최대 1,000자)"
-            rows={5}
-            maxLength={1000}
-            value={form.content}
-            onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-            required
-          />
+
+          <div>
+            <input
+              type="text"
+              className={`input input-bordered input-sm w-full ${formErrors.title ? 'input-error' : ''}`}
+              placeholder="제목을 입력하세요 (5자 이상, 최대 100자)"
+              value={form.title}
+              maxLength={100}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, title: e.target.value }))
+                if (formErrors.title) setFormErrors((fe) => ({ ...fe, title: '' }))
+              }}
+              required
+            />
+            {formErrors.title && <p className="text-error text-xs mt-1">{formErrors.title}</p>}
+          </div>
+
+          <div>
+            <textarea
+              className={`textarea textarea-bordered w-full ${formErrors.content ? 'textarea-error' : ''}`}
+              placeholder="문의 내용을 입력하세요 (10자 이상, 최대 1,000자)"
+              rows={5}
+              maxLength={1000}
+              value={form.content}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, content: e.target.value }))
+                if (formErrors.content) setFormErrors((fe) => ({ ...fe, content: '' }))
+              }}
+              required
+            />
+            {formErrors.content && <p className="text-error text-xs mt-1">{formErrors.content}</p>}
+          </div>
+
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -89,7 +135,6 @@ export default function InquiriesPage() {
         </form>
       )}
 
-      {/* 문의 목록 */}
       {inquiries.length === 0 ? (
         <div className="text-center py-20 text-base-content/50">
           <p className="text-5xl mb-4">💬</p>
@@ -100,7 +145,6 @@ export default function InquiriesPage() {
           {inquiries.map((inquiry) => (
             <div key={inquiry.id} className="card bg-base-100 shadow-sm border border-base-200">
               <div className="card-body p-4 gap-3">
-                {/* 헤더 */}
                 <div
                   className="flex items-center justify-between cursor-pointer"
                   onClick={() => setOpenId(openId === inquiry.id ? null : inquiry.id)}
@@ -117,7 +161,6 @@ export default function InquiriesPage() {
                   <span className="text-xs text-base-content/40 shrink-0 ml-2">{formatDate(inquiry.createdAt)}</span>
                 </div>
 
-                {/* 펼쳐진 내용 */}
                 {openId === inquiry.id && (
                   <div className="space-y-3 border-t pt-3">
                     <p className="text-sm leading-relaxed text-base-content/80">{inquiry.content}</p>

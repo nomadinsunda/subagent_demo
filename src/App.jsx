@@ -9,12 +9,14 @@ import ProductListPage from './features/products/ProductListPage'
 import ProductDetailPage from './features/products/ProductDetailPage'
 import LoginPage from './features/auth/LoginPage'
 import CartPage from './features/cart/CartPage'
+import { Navigate } from 'react-router-dom'
 import OrdersPage from './features/orders/OrdersPage'
 import OrderDetailPage from './features/orders/OrderDetailPage'
 import ProfilePage from './features/user/ProfilePage'
 import PointsPage from './features/user/PointsPage'
 import MyReviewsPage from './features/reviews/MyReviewsPage'
 import InquiriesPage from './features/inquiries/InquiriesPage'
+import MyPageLayout from './features/mypage/MyPageLayout'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -35,30 +37,20 @@ export default function App() {
                 path="cart"
                 element={<ProtectedRoute><CartPage /></ProtectedRoute>}
               />
+
+              {/* My Page — 중첩 라우트 (LNB + Dashboard 공유 레이아웃) */}
               <Route
-                path="my/orders"
-                element={<ProtectedRoute><OrdersPage /></ProtectedRoute>}
-              />
-              <Route
-                path="my/orders/:id"
-                element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>}
-              />
-              <Route
-                path="my/profile"
-                element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
-              />
-              <Route
-                path="my/points"
-                element={<ProtectedRoute><PointsPage /></ProtectedRoute>}
-              />
-              <Route
-                path="my/reviews"
-                element={<ProtectedRoute><MyReviewsPage /></ProtectedRoute>}
-              />
-              <Route
-                path="my/inquiries"
-                element={<ProtectedRoute><InquiriesPage /></ProtectedRoute>}
-              />
+                path="my"
+                element={<ProtectedRoute><MyPageLayout /></ProtectedRoute>}
+              >
+                <Route index element={<Navigate to="orders" replace />} />
+                <Route path="orders" element={<OrdersPage />} />
+                <Route path="orders/:id" element={<OrderDetailPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="points" element={<PointsPage />} />
+                <Route path="reviews" element={<MyReviewsPage />} />
+                <Route path="inquiries" element={<InquiriesPage />} />
+              </Route>
 
               <Route path="*" element={<NotFoundPage />} />
             </Route>

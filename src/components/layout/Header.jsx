@@ -66,6 +66,16 @@ export default function Header() {
           )}
         </Link>
 
+        {/* 마이멍샵 */}
+        {isLoggedIn && (
+          <Link to="/my" className="btn btn-ghost flex flex-col items-center justify-center h-auto py-1 px-2 gap-0.5 min-h-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span className="text-[9px] leading-none font-medium">마이멍샵</span>
+          </Link>
+        )}
+
         {isLoggedIn ? (
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
@@ -75,6 +85,7 @@ export default function Header() {
             </label>
             <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-44">
               <li className="menu-title px-2 py-1 text-xs text-base-content/50">{user?.name}님</li>
+              <li><Link to="/my">마이페이지</Link></li>
               <li><Link to="/my/orders">내 주문</Link></li>
               <li><Link to="/my/reviews">내 리뷰</Link></li>
               <li><Link to="/my/points">포인트</Link></li>

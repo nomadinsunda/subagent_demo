@@ -78,3 +78,22 @@ salePrice = Math.floor(price * (1 - discountRate / 100))
 
 - 상품 데이터는 불변(Immutable) — 주문/리뷰와 달리 Mock 모드에서 수정 불가
 - 컴포넌트에서 `src/mocks/products.js`를 직접 import 금지 → RTK Query 훅(`useGetProductsQuery`, `useGetProductQuery`)을 통해서만 접근
+
+---
+
+## 7. 에러 처리
+
+### Query 에러
+
+| 페이지 | 상황 | 처리 |
+|---|---|---|
+| 상품 목록 (`ProductListPage`) | 조회 실패 | `ErrorState` 컴포넌트 + "다시 시도" 버튼 (`refetch`) |
+| 상품 상세 (`ProductDetailPage`) | 조회 실패 | `ErrorState` 컴포넌트 + "다시 시도" 버튼 (`refetch`) |
+| 상품 상세 | 상품 없음 (`!product`) | "상품을 찾을 수 없습니다" 안내 텍스트 |
+
+### Mutation 에러 (ProductDetailPage)
+
+| 작업 | 실패 시 처리 |
+|---|---|
+| 장바구니 담기 (`addToCart`) | Toast "장바구니 추가에 실패했습니다" (error) |
+| 문의 등록 (`createInquiry`) | Toast "문의 등록에 실패했습니다. 다시 시도해 주세요." (error) |

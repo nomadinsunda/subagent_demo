@@ -6,35 +6,49 @@ import {
   useClearCartMutation,
 } from './cartApi'
 import Spinner from '../../shared/components/Spinner'
+import ErrorState from '../../shared/components/ErrorState'
+import Toast from '../../shared/components/Toast'
+import { useToast } from '../../shared/hooks/useToast'
 import { formatPrice } from '../../shared/utils/formatters'
 import { SHIPPING_FREE_THRESHOLD, SHIPPING_FEE } from '../../shared/utils/constants'
 
 export default function CartPage() {
   const navigate = useNavigate()
-  const { data: items = [], isLoading } = useGetCartQuery()
+  const { data: items = [], isLoading, isError, refetch } = useGetCartQuery()
   const [updateItem] = useUpdateCartItemMutation()
   const [removeItem] = useRemoveFromCartMutation()
   const [clearCart, { isLoading: isClearing }] = useClearCartMutation()
+  const { toasts, toast } = useToast()
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shippingFee = items.length === 0 ? 0 : subtotal >= SHIPPING_FREE_THRESHOLD ? 0 : SHIPPING_FEE
   const total = subtotal + shippingFee
 
-  const handleQuantity = (item, delta) => {
+  const handleQuantity = async (item, delta) => {
     const next = item.quantity + delta
     if (next < 1 || next > item.stock) return
-    updateItem({ id: item.id, quantity: next })
+    const result = await updateItem({ id: item.id, quantity: next })
+    if (result.error) toast('수량 변경에 실패했습니다', 'error')
+  }
+
+  const handleRemove = async (id) => {
+    const result = await removeItem(id)
+    if (result.error) toast('삭제에 실패했습니다', 'error')
   }
 
   const handleClear = async () => {
     if (!confirm('장바구니를 비우시겠습니까?')) return
-    await clearCart()
+    const result = await clearCart()
+    if (result.error) toast('장바구니 비우기에 실패했습니다', 'error')
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <Toast toasts={toasts} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">장바구니</h1>
         {items.length > 0 && (
@@ -77,7 +91,6 @@ export default function CartPage() {
                     </Link>
                     <p className="font-bold text-primary">{formatPrice(item.price)}</p>
                     <div className="flex items-center justify-between">
-                      {/* 수량 조절 */}
                       <div className="join">
                         <button
                           className="join-item btn btn-xs"
@@ -99,7 +112,7 @@ export default function CartPage() {
                         </span>
                         <button
                           className="btn btn-ghost btn-xs text-error"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => handleRemove(item.id)}
                         >✕</button>
                       </div>
                     </div>

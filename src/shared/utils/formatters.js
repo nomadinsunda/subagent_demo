@@ -48,3 +48,15 @@ export const calcPointsEarned = (paymentAmount) => Math.floor(paymentAmount * 0.
  * @returns {string}
  */
 export const formatRating = (rating) => '★'.repeat(rating) + '☆'.repeat(5 - rating)
+
+/**
+ * 연락처 중간 자리 마스킹
+ * @param {string} phone e.g. "010-1234-5678"
+ * @returns {string} e.g. "010-****-5678"
+ */
+export const maskPhone = (phone) => {
+  if (!phone) return '-'
+  const parts = phone.split('-')
+  if (parts.length !== 3) return phone
+  return `${parts[0]}-****-${parts[2]}`
+}

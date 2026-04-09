@@ -1,12 +1,14 @@
 import { useGetMyPointsQuery } from './pointsApi'
 import Spinner from '../../shared/components/Spinner'
+import ErrorState from '../../shared/components/ErrorState'
 import { formatDate } from '../../shared/utils/formatters'
 import { POINT_TYPE_LABEL } from '../../shared/utils/constants'
 
 export default function PointsPage() {
-  const { data, isLoading } = useGetMyPointsQuery()
+  const { data, isLoading, isError, refetch } = useGetMyPointsQuery()
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
 
   const sortedHistory = [...(data?.history || [])].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -16,7 +18,6 @@ export default function PointsPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">포인트</h1>
 
-      {/* 잔액 카드 */}
       <div className="card bg-primary text-primary-content shadow-lg">
         <div className="card-body items-center text-center py-10">
           <p className="text-sm opacity-80">현재 보유 포인트</p>
@@ -27,7 +28,6 @@ export default function PointsPage() {
         </div>
       </div>
 
-      {/* 적립 안내 */}
       <div className="grid grid-cols-2 gap-3 text-center">
         {[
           { label: '구매 적립', value: '결제금액의 1%' },
@@ -42,7 +42,6 @@ export default function PointsPage() {
         ))}
       </div>
 
-      {/* 포인트 내역 */}
       <div className="card bg-base-100 shadow-sm border border-base-200">
         <div className="card-body">
           <h2 className="font-bold mb-3">포인트 내역</h2>

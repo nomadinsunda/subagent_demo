@@ -1,39 +1,29 @@
 export const ORDER_STATUS = {
-  PENDING: 'pending',
-  PAID: 'paid',
+  WAITING: 'waiting',
   PREPARING: 'preparing',
-  SHIPPED: 'shipped',
+  SHIPPING: 'shipping',
   DELIVERED: 'delivered',
   CANCELLED: 'cancelled',
-  REFUNDING: 'refunding',
-  REFUNDED: 'refunded',
 }
 
 export const ORDER_STATUS_LABEL = {
-  [ORDER_STATUS.PENDING]: '결제 대기',
-  [ORDER_STATUS.PAID]: '결제 완료',
-  [ORDER_STATUS.PREPARING]: '상품 준비중',
-  [ORDER_STATUS.SHIPPED]: '배송중',
+  [ORDER_STATUS.WAITING]: '결제 대기',
+  [ORDER_STATUS.PREPARING]: '배송 준비중',
+  [ORDER_STATUS.SHIPPING]: '배송중',
   [ORDER_STATUS.DELIVERED]: '배송 완료',
   [ORDER_STATUS.CANCELLED]: '주문 취소',
-  [ORDER_STATUS.REFUNDING]: '환불 처리중',
-  [ORDER_STATUS.REFUNDED]: '환불 완료',
 }
 
 export const ORDER_STATUS_BADGE = {
-  [ORDER_STATUS.PENDING]: 'badge-warning',
-  [ORDER_STATUS.PAID]: 'badge-info',
+  [ORDER_STATUS.WAITING]: 'badge-warning',
   [ORDER_STATUS.PREPARING]: 'badge-info',
-  [ORDER_STATUS.SHIPPED]: 'badge-primary',
+  [ORDER_STATUS.SHIPPING]: 'badge-primary',
   [ORDER_STATUS.DELIVERED]: 'badge-success',
   [ORDER_STATUS.CANCELLED]: 'badge-error',
-  [ORDER_STATUS.REFUNDING]: 'badge-warning',
-  [ORDER_STATUS.REFUNDED]: 'badge-ghost',
 }
 
 export const CANCELLABLE_STATUSES = [
-  ORDER_STATUS.PENDING,
-  ORDER_STATUS.PAID,
+  ORDER_STATUS.WAITING,
   ORDER_STATUS.PREPARING,
 ]
 

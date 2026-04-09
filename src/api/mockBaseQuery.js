@@ -98,18 +98,25 @@ const handleRequest = ({ url, method = 'GET', body, params }) => {
     const shippingFee = subtotal >= 50000 ? 0 : 3000
     const pointsUsed = body.pointsUsed || 0
     const amount = subtotal + shippingFee - pointsUsed
+    const now = new Date()
+    const estimated = new Date(now)
+    estimated.setDate(estimated.getDate() + 3)
+    const pad = (n) => String(n).padStart(2, '0')
+    const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
     const newOrder = {
       id: orders.length + 1,
+      orderNumber: `${dateStr}-${String(orders.length + 1).padStart(5, '0')}`,
       userId: MOCK_USER.id,
-      status: 'paid',
+      status: 'preparing',
       items: body.items,
       shippingAddress: body.shippingAddress,
       payment: { method: body.paymentMethod || 'card', amount },
       pointsUsed,
       pointsEarned: Math.floor(amount * 0.01),
       shippingFee,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      estimatedDelivery: estimated.toISOString().slice(0, 10),
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
     }
     orders = [newOrder, ...orders]
     return ok(newOrder)
@@ -127,7 +134,7 @@ const handleRequest = ({ url, method = 'GET', body, params }) => {
     if (!isLoggedIn) return fail(401, '인증이 필요합니다')
     const idx = orders.findIndex((o) => o.id === Number(cancelMatch[1]))
     if (idx === -1) return fail(404, '주문을 찾을 수 없습니다')
-    if (!['pending', 'paid', 'preparing'].includes(orders[idx].status))
+    if (!['waiting', 'preparing'].includes(orders[idx].status))
       return fail(400, '취소할 수 없는 주문 상태입니다')
     orders = orders.map((o, i) =>
       i === idx ? { ...o, status: 'cancelled', updatedAt: new Date().toISOString() } : o

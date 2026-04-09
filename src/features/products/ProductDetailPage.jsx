@@ -5,6 +5,9 @@ import { useGetProductReviewsQuery } from '../reviews/reviewsApi'
 import { useGetProductInquiriesQuery, useCreateInquiryMutation } from '../inquiries/inquiriesApi'
 import { useAddToCartMutation } from '../cart/cartApi'
 import Spinner from '../../shared/components/Spinner'
+import ErrorState from '../../shared/components/ErrorState'
+import Toast from '../../shared/components/Toast'
+import { useToast } from '../../shared/hooks/useToast'
 import { formatPrice, formatDate, formatRating } from '../../shared/utils/formatters'
 import { CATEGORY_LABEL, INQUIRY_TYPE_LABEL, SHIPPING_FREE_THRESHOLD, SHIPPING_FEE } from '../../shared/utils/constants'
 import { useAuth } from '../auth/useAuth'
@@ -16,9 +19,11 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('reviews')
   const [inquiryForm, setInquiryForm] = useState({ type: 'product', title: '', content: '', isSecret: false })
+  const [inquiryErrors, setInquiryErrors] = useState({})
   const [showInquiryForm, setShowInquiryForm] = useState(false)
+  const { toasts, toast } = useToast()
 
-  const { data: product, isLoading } = useGetProductQuery(id)
+  const { data: product, isLoading, isError, refetch } = useGetProductQuery(id)
   const { data: reviews = [] } = useGetProductReviewsQuery({ productId: id })
   const { data: inquiries = [] } = useGetProductInquiriesQuery(id)
   const [createInquiry, { isLoading: isSubmitting }] = useCreateInquiryMutation()
@@ -26,6 +31,7 @@ export default function ProductDetailPage() {
   const [cartAdded, setCartAdded] = useState(false)
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
   if (!product) return <div className="text-center py-20 text-base-content/50">상품을 찾을 수 없습니다</div>
 
   const subtotal = product.salePrice * quantity
@@ -33,23 +39,45 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!isLoggedIn) return navigate('/login', { state: { from: location.pathname } })
-    await addToCart({ productId: Number(id), quantity })
-    setCartAdded(true)
-    setTimeout(() => setCartAdded(false), 2000)
+    const result = await addToCart({ productId: Number(id), quantity })
+    if (result.error) {
+      toast('장바구니 추가에 실패했습니다', 'error')
+    } else {
+      setCartAdded(true)
+      setTimeout(() => setCartAdded(false), 2000)
+    }
+  }
+
+  const validateInquiry = () => {
+    const errors = {}
+    if (inquiryForm.title.length < 5) errors.title = '제목을 5자 이상 입력해주세요'
+    if (inquiryForm.content.length < 10) errors.content = '내용을 10자 이상 입력해주세요'
+    return errors
   }
 
   const handleInquirySubmit = async (e) => {
     e.preventDefault()
-    if (inquiryForm.title.length < 5) return alert('제목을 5자 이상 입력해주세요')
-    if (inquiryForm.content.length < 10) return alert('내용을 10자 이상 입력해주세요')
+    const errors = validateInquiry()
+    if (Object.keys(errors).length > 0) {
+      setInquiryErrors(errors)
+      return
+    }
+    setInquiryErrors({})
     if (!isLoggedIn) return navigate('/login', { state: { from: location.pathname } })
-    await createInquiry({ ...inquiryForm, productId: Number(id) })
-    setInquiryForm({ type: 'product', title: '', content: '', isSecret: false })
-    setShowInquiryForm(false)
+    const result = await createInquiry({ ...inquiryForm, productId: Number(id) })
+    if (result.error) {
+      toast('문의 등록에 실패했습니다. 다시 시도해 주세요.', 'error')
+    } else {
+      setInquiryForm({ type: 'product', title: '', content: '', isSecret: false })
+      setShowInquiryForm(false)
+      toast('문의가 등록되었습니다', 'success')
+    }
   }
 
   return (
     <div className="space-y-10">
+      <Toast toasts={toasts} />
+
       {/* 브레드크럼 */}
       <nav className="breadcrumbs text-sm">
         <ul>
@@ -213,7 +241,10 @@ export default function ProductDetailPage() {
               className="btn btn-outline btn-sm"
               onClick={() => {
                 if (!isLoggedIn) navigate('/login', { state: { from: location.pathname } })
-                else setShowInquiryForm(!showInquiryForm)
+                else {
+                  setShowInquiryForm(!showInquiryForm)
+                  setInquiryErrors({})
+                }
               }}
             >
               {showInquiryForm ? '취소' : '문의하기'}
@@ -230,22 +261,37 @@ export default function ProductDetailPage() {
                     <option key={k} value={k}>{v}</option>
                   ))}
                 </select>
-                <input
-                  type="text"
-                  className="input input-bordered input-sm w-full"
-                  placeholder="제목 (5자 이상)"
-                  value={inquiryForm.title}
-                  onChange={(e) => setInquiryForm((f) => ({ ...f, title: e.target.value }))}
-                  required
-                />
-                <textarea
-                  className="textarea textarea-bordered w-full"
-                  placeholder="내용을 입력해 주세요 (10자 이상)"
-                  rows={4}
-                  value={inquiryForm.content}
-                  onChange={(e) => setInquiryForm((f) => ({ ...f, content: e.target.value }))}
-                  required
-                />
+
+                <div>
+                  <input
+                    type="text"
+                    className={`input input-bordered input-sm w-full ${inquiryErrors.title ? 'input-error' : ''}`}
+                    placeholder="제목 (5자 이상)"
+                    value={inquiryForm.title}
+                    onChange={(e) => {
+                      setInquiryForm((f) => ({ ...f, title: e.target.value }))
+                      if (inquiryErrors.title) setInquiryErrors((ie) => ({ ...ie, title: '' }))
+                    }}
+                    required
+                  />
+                  {inquiryErrors.title && <p className="text-error text-xs mt-1">{inquiryErrors.title}</p>}
+                </div>
+
+                <div>
+                  <textarea
+                    className={`textarea textarea-bordered w-full ${inquiryErrors.content ? 'textarea-error' : ''}`}
+                    placeholder="내용을 입력해 주세요 (10자 이상)"
+                    rows={4}
+                    value={inquiryForm.content}
+                    onChange={(e) => {
+                      setInquiryForm((f) => ({ ...f, content: e.target.value }))
+                      if (inquiryErrors.content) setInquiryErrors((ie) => ({ ...ie, content: '' }))
+                    }}
+                    required
+                  />
+                  {inquiryErrors.content && <p className="text-error text-xs mt-1">{inquiryErrors.content}</p>}
+                </div>
+
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

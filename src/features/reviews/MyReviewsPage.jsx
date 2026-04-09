@@ -2,36 +2,53 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGetMyReviewsQuery, useDeleteReviewMutation, useUpdateReviewMutation } from './reviewsApi'
 import Spinner from '../../shared/components/Spinner'
+import ErrorState from '../../shared/components/ErrorState'
+import Toast from '../../shared/components/Toast'
+import { useToast } from '../../shared/hooks/useToast'
 import { formatDate, formatRating } from '../../shared/utils/formatters'
 
 export default function MyReviewsPage() {
-  const { data: reviews = [], isLoading } = useGetMyReviewsQuery()
+  const { data: reviews = [], isLoading, isError, refetch } = useGetMyReviewsQuery()
   const [deleteReview] = useDeleteReviewMutation()
   const [updateReview, { isLoading: isUpdating }] = useUpdateReviewMutation()
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ rating: 5, content: '' })
+  const [editError, setEditError] = useState('')
+  const { toasts, toast } = useToast()
 
   const handleEditStart = (review) => {
     setEditingId(review.id)
     setEditForm({ rating: review.rating, content: review.content })
+    setEditError('')
   }
 
   const handleEditSubmit = async (e, productId) => {
     e.preventDefault()
-    if (editForm.content.length < 10) return alert('내용을 10자 이상 입력해주세요')
-    await updateReview({ id: editingId, productId, ...editForm })
-    setEditingId(null)
+    if (editForm.content.length < 10) {
+      setEditError('내용을 10자 이상 입력해주세요')
+      return
+    }
+    setEditError('')
+    const result = await updateReview({ id: editingId, productId, ...editForm })
+    if (result.error) {
+      toast('리뷰 수정에 실패했습니다', 'error')
+    } else {
+      setEditingId(null)
+    }
   }
 
   const handleDelete = async (id) => {
     if (!confirm('리뷰를 삭제하시겠습니까?')) return
-    await deleteReview(id)
+    const result = await deleteReview(id)
+    if (result.error) toast('리뷰 삭제에 실패했습니다', 'error')
   }
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <Toast toasts={toasts} />
       <h1 className="text-2xl font-bold">내 리뷰</h1>
 
       {reviews.length === 0 ? (
@@ -63,12 +80,16 @@ export default function MyReviewsPage() {
                       </div>
                     </div>
                     <textarea
-                      className="textarea textarea-bordered w-full"
+                      className={`textarea textarea-bordered w-full ${editError ? 'textarea-error' : ''}`}
                       rows={4}
                       value={editForm.content}
-                      onChange={(e) => setEditForm((f) => ({ ...f, content: e.target.value }))}
+                      onChange={(e) => {
+                        setEditForm((f) => ({ ...f, content: e.target.value }))
+                        if (editError) setEditError('')
+                      }}
                       required
                     />
+                    {editError && <p className="text-error text-xs">{editError}</p>}
                     <div className="flex gap-2">
                       <button type="submit" className="btn btn-primary btn-sm" disabled={isUpdating}>저장</button>
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditingId(null)}>취소</button>

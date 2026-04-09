@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "Bash(wc -l \"C:/development/workspaces/codes/aiagent_projects/subagent_demo/src/mocks\"/*.js)"
+      "Bash(wc -l \"C:/development/workspaces/codes/aiagent_projects/subagent_demo/src/mocks\"/*.js)",
+      "Bash(pkill -f \"vite\")"
     ]
   }
 }

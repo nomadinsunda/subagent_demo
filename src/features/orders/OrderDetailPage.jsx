@@ -1,8 +1,12 @@
 import { useParams, Link } from 'react-router-dom'
 import { useGetOrderQuery, useCancelOrderMutation } from './ordersApi'
 import Spinner from '../../shared/components/Spinner'
-import { formatPrice, formatDateTime } from '../../shared/utils/formatters'
+import ErrorState from '../../shared/components/ErrorState'
+import Toast from '../../shared/components/Toast'
+import { useToast } from '../../shared/hooks/useToast'
+import { formatPrice, formatDateTime, formatDate, maskPhone } from '../../shared/utils/formatters'
 import { ORDER_STATUS_LABEL, ORDER_STATUS_BADGE, CANCELLABLE_STATUSES } from '../../shared/utils/constants'
+import StatusBadge from './components/StatusBadge'
 
 const PAYMENT_METHOD_LABEL = {
   card: '신용/체크카드',
@@ -13,31 +17,37 @@ const PAYMENT_METHOD_LABEL = {
 
 export default function OrderDetailPage() {
   const { id } = useParams()
-  const { data: order, isLoading } = useGetOrderQuery(id)
+  const { data: order, isLoading, isError, refetch } = useGetOrderQuery(id)
   const [cancelOrder, { isLoading: isCancelling }] = useCancelOrderMutation()
+  const { toasts, toast } = useToast()
 
   if (isLoading) return <Spinner />
+  if (isError) return <ErrorState onRetry={refetch} />
   if (!order) return <div className="text-center py-20 text-base-content/50">주문을 찾을 수 없습니다</div>
 
   const canCancel = CANCELLABLE_STATUSES.includes(order.status)
 
   const handleCancel = async () => {
     if (!confirm('주문을 취소하시겠습니까?')) return
-    await cancelOrder(order.id)
+    const result = await cancelOrder(order.id)
+    if (result.error) toast('주문 취소에 실패했습니다. 다시 시도해 주세요.', 'error')
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* 헤더 */}
-      <div className="flex items-center gap-4">
-        <Link to="/my/orders" className="btn btn-ghost btn-sm">← 내 주문</Link>
-        <h1 className="text-xl font-bold">주문 #{order.id}</h1>
-        <span className={`badge ${ORDER_STATUS_BADGE[order.status]}`}>
-          {ORDER_STATUS_LABEL[order.status]}
-        </span>
+      <Toast toasts={toasts} />
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <Link to="/my/orders" className="btn btn-ghost btn-sm">← 주문내역</Link>
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-bold">{order.orderNumber}</h1>
+            <StatusBadge status={order.status} />
+          </div>
+          <p className="text-xs text-[#888888] mt-0.5">{formatDateTime(order.createdAt)}</p>
+        </div>
       </div>
 
-      {/* 주문 상품 */}
       <div className="card bg-base-100 shadow-sm border border-base-200">
         <div className="card-body gap-4">
           <h2 className="font-bold">주문 상품</h2>
@@ -65,7 +75,6 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      {/* 결제 요약 */}
       <div className="card bg-base-100 shadow-sm border border-base-200">
         <div className="card-body gap-2">
           <h2 className="font-bold mb-2">결제 정보</h2>
@@ -91,25 +100,23 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      {/* 배송지 */}
       <div className="card bg-base-100 shadow-sm border border-base-200">
         <div className="card-body">
           <h2 className="font-bold mb-2">배송지</h2>
           <div className="text-sm space-y-1 text-base-content/70">
             <p className="font-medium text-base-content">{order.shippingAddress.recipient}</p>
-            <p>{order.shippingAddress.phone}</p>
+            <p>{maskPhone(order.shippingAddress.phone)}</p>
             <p>[{order.shippingAddress.zipCode}] {order.shippingAddress.address}</p>
             <p>{order.shippingAddress.detailAddress}</p>
           </div>
+          {order.estimatedDelivery && order.status === 'shipping' && (
+            <p className="text-xs text-[#00891A] font-medium mt-2">
+              {formatDate(order.estimatedDelivery + 'T00:00:00Z')} 도착 보장
+            </p>
+          )}
         </div>
       </div>
 
-      {/* 주문 날짜 */}
-      <p className="text-xs text-base-content/40 text-right">
-        주문일시: {formatDateTime(order.createdAt)}
-      </p>
-
-      {/* 취소 버튼 */}
       {canCancel && (
         <button
           className="btn btn-error btn-outline w-full"
