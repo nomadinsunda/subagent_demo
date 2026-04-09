@@ -53,12 +53,14 @@ src/
 │   ├── products/           productsApi, ProductCard, ProductListPage, ProductDetailPage
 │   ├── cart/               cartApi, CartPage
 │   ├── orders/             ordersApi, OrdersPage, OrderDetailPage
+│   │   └── components/     StatusBadge, OrderCard, PeriodFilter
 │   ├── reviews/            reviewsApi, MyReviewsPage
 │   ├── inquiries/          inquiriesApi, InquiriesPage
 │   ├── user/               usersApi, pointsApi, ProfilePage, PointsPage
+│   ├── mypage/             MyPageLayout (LNB 사이드바 + Dashboard 공유 레이아웃)
 │   └── home/               HomePage
 ├── shared/                 도메인 무관 공용 코드
-│   ├── components/         ErrorBoundary, Spinner
+│   ├── components/         ErrorBoundary, Spinner, Toast, ErrorState
 │   └── utils/              constants, formatters, cookies, oauth2
 ├── api/                    인프라 레이어 (apiSlice, mockBaseQuery)
 ├── app/                    Redux store
@@ -93,6 +95,9 @@ src/
 8. **Mock 소스** — 새 도메인은 `src/mocks/` + `mockBaseQuery.js` 라우트 등록. 컴포넌트에서 `src/mocks/` 직접 import 금지.
 9. **Mock 변경** — 가변 데이터는 `mockBaseQuery.js` `let` 변수에서만 변경. `src/mocks/` 원본 배열 직접 변경 금지.
 10. **Auto-Doc Sync** — 비즈니스 로직(배송비, 포인트율, 상태값, 카테고리 등) 변경 시 `docs/*.md` 자동 갱신 필수.
-11. **Docs First** — 작업 전 관련 `docs/*.md`와 이 파일을 먼저 읽고 명세 확인.
+11. **Docs First (절대 원칙)** — 코드 한 줄 작성 전에 반드시 관련 `docs/*.md`를 먼저 업데이트한다. 변경의 크기(대·소)와 무관하게 예외 없이 적용. 순서를 어기면 규칙 위반이다:
+    1. 관련 `docs/*.md` 읽기 → 명세 파악
+    2. `docs/*.md` 업데이트 또는 신규 생성
+    3. 코딩 시작
 12. **Change Report** — 완료 보고 시 수정된 코드와 문서(`docs/*.md`) 변경 내역을 함께 보고.
 13. **New Domain Doc** — 신규 도메인·기능 추가 시 코딩 전에 반드시 `docs/{domain}.md`를 신규 생성하여 비즈니스 로직(데이터 구조, 상태값, 정책, API, UI 규칙)을 먼저 정의할 것. 기존 docs 업데이트만으로는 불충분.
