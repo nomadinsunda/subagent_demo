@@ -1,5 +1,3 @@
-## AI 규칙 (전체 작업에 적용)
-
 1. **No Axios** — 네트워크 요청은 RTK Query만.
 2. **Pure JS** — TypeScript 문법 금지.
 3. **No Token Storage** — 토큰을 localStorage·sessionStorage에 저장 금지.
