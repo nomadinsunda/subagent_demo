@@ -46,6 +46,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 → `docs/project-structure.md` 참조
 
+## 작업 시작 전 필독 파일
+
+| 파일 | 내용 | 항상 읽기 |
+|---|---|---|
+| `docs/project-structure.md` | 전체 src/ 및 docs/ 구조 | ✅ |
+| `docs/domain/{도메인}.md` | 도메인 비즈니스 명세 | 관련 작업 시 |
+| `docs/view/{뷰}.md` | 뷰 레이아웃 명세 | 관련 작업 시 |
+| `.clauderules` | AI Rules 1~13 | ✅ |
+| `.claude/skills/{스킬}/SKILL.md` | 작업 유형별 패턴 | 관련 작업 시 |
+
 ## Skills 참조
 
 | 스킬 | 경로 | 참고 시점 |
