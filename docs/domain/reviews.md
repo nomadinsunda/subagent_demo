@@ -59,7 +59,7 @@
 
 ## 5. Mock 데이터 (`src/mocks/reviews.js`)
 
-- 초기 **10개** 리뷰 (가변 데이터)
+- 초기 **300개** 리뷰 (가변 데이터, 25개 수기 + 275개 자동 생성)
 - `mockBaseQuery.js`가 모듈 레벨 `let` 변수로 복사하여 관리
 - `src/mocks/reviews.js` 원본 배열 직접 변경 금지
 

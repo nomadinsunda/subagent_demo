@@ -3,12 +3,13 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGetProductQuery } from './productsApi'
 import { useGetProductReviewsQuery } from '../reviews/reviewsApi'
 import { useGetProductInquiriesQuery, useCreateInquiryMutation } from '../inquiries/inquiriesApi'
+import ProductReviewSection from './components/ProductReviewSection'
 import { useAddToCartMutation } from '../cart/cartApi'
 import Spinner from '../../shared/components/Spinner'
 import ErrorState from '../../shared/components/ErrorState'
 import Toast from '../../shared/components/Toast'
 import { useToast } from '../../shared/hooks/useToast'
-import { formatPrice, formatDate, formatRating } from '../../shared/utils/formatters'
+import { formatPrice, formatDate } from '../../shared/utils/formatters'
 import { CATEGORY_LABEL, INQUIRY_TYPE_LABEL, SHIPPING_FREE_THRESHOLD, SHIPPING_FEE } from '../../shared/utils/constants'
 import { useAuth } from '../auth/useAuth'
 
@@ -200,39 +201,7 @@ export default function ProductDetailPage() {
         </div>
 
         {/* 리뷰 탭 */}
-        {activeTab === 'reviews' && (
-          <div className="space-y-4">
-            {reviews.length === 0 ? (
-              <div className="text-center py-12 text-base-content/50">
-                <p className="text-4xl mb-3">✍️</p>
-                <p>아직 리뷰가 없습니다. 첫 리뷰를 작성해 보세요!</p>
-              </div>
-            ) : (
-              reviews.map((review) => (
-                <div key={review.id} className="card bg-base-200 p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <div className="avatar placeholder">
-                        <div className="bg-neutral text-neutral-content rounded-full w-8">
-                          <span className="text-xs">{review.userName[0]}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{review.userName}</p>
-                        <p className="text-xs text-base-content/50">{formatDate(review.createdAt)}</p>
-                      </div>
-                    </div>
-                    <span className="text-yellow-500 text-sm">{formatRating(review.rating)}</span>
-                  </div>
-                  <p className="text-sm leading-relaxed">{review.content}</p>
-                  {review.imageUrl && (
-                    <img src={review.imageUrl} alt="리뷰 이미지" className="mt-3 w-24 h-24 object-cover rounded-lg" />
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        )}
+        {activeTab === 'reviews' && <ProductReviewSection reviews={reviews} />}
 
         {/* 문의 탭 */}
         {activeTab === 'inquiries' && (

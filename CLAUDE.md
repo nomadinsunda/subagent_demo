@@ -32,7 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **가변 데이터** (orders, reviews, inquiries): `mockBaseQuery.js` 모듈 레벨 `let` 변수로 관리
 - **불변 데이터** (products): `mockBaseQuery.js`가 직접 참조만 함
 
-→ 구현 패턴 상세: `.claude/skills/04-mock-architecture/`
+→ 구현 패턴 상세: `.claude/skills/mock-architecture/`
 
 ## 인증
 
@@ -40,7 +40,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 모든 `baseQuery`는 `withReauth()` 래퍼 필수 — 401 감지 시 `/auth/refresh` 자동 시도, 재실패 시 `logout()`.
 - OAuth2: 프론트는 인가 URL 리다이렉트만 수행. Client ID/Secret 코드 포함 **금지**.
 
-→ 구현 패턴 상세: `.claude/skills/02-auth-security/`
+→ 구현 패턴 상세: `.claude/skills/auth-security/`
 
 ## 디렉토리 구조
 
@@ -53,21 +53,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `docs/project-structure.md` | 전체 src/ 및 docs/ 구조 | ✅ |
 | `docs/domain/{도메인}.md` | 도메인 비즈니스 명세 | 관련 작업 시 |
 | `docs/view/{뷰}.md` | 뷰 레이아웃 명세 | 관련 작업 시 |
-| `.clauderules` | AI Rules 1~13 | ✅ |
+| `.claude/rules/` | AI Rules 1~13 (tech-standards, mock-architecture, doc-sync) | ✅ |
 | `.claude/skills/{스킬}/SKILL.md` | 작업 유형별 패턴 | 관련 작업 시 |
 
 ## Skills 참조
 
 | 스킬 | 경로 | 참고 시점 |
 |---|---|---|
-| 개발 표준 | `01-dev-standards/` | 모든 작업 전 |
-| 인증·보안 | `02-auth-security/` | 인증 관련 작업 |
-| RTK Query | `03-rtk-query-api/` | API 엔드포인트 추가·수정 |
-| Mock 아키텍처 | `04-mock-architecture/` | 새 도메인 추가 |
-| 스타일링 | `05-styling/` | UI 컴포넌트 작업 |
-| 앱 구조 | `06-app-structure/` | 라우트·컴포넌트 추가 |
-| 문서 동기화 | `07-auto-doc-sync/` | 비즈니스 로직 변경 시 |
+| 개발 표준 | `dev-standards/` | 모든 작업 전 |
+| 인증·보안 | `auth-security/` | 인증 관련 작업 |
+| RTK Query | `rtk-query-api/` | API 엔드포인트 추가·수정 |
+| Mock 아키텍처 | `mock-architecture/` | 새 도메인 추가 |
+| 스타일링 | `styling/` | UI 컴포넌트 작업 |
+| 앱 구조 | `app-structure/` | 라우트·컴포넌트 추가 |
+| 문서 동기화 | `auto-doc-sync/` | 비즈니스 로직 변경 시 |
 
 ## AI 규칙
 
-→ `.clauderules` 파일 참조 (프로젝트 루트)
+→ `.claude/rules/` 폴더 참조 (tech-standards.md · mock-architecture.md · doc-sync.md)
