@@ -190,6 +190,6 @@ tagTypes: ['Auth', 'Product', 'Order', 'Review', 'Points', 'Inquiry', 'Address',
 import '../api/cartApi'   // 기존 import 블록 마지막에 추가
 ```
 
-## Step 6. `docs/cart.md` 생성 (Rule 12 필수)
+## Step 6. `docs/domain/cart.md` 생성 (Rule 12 필수)
 
 → `07-auto-doc-sync/template.md` 기반으로 작성

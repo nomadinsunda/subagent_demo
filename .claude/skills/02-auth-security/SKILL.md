@@ -6,7 +6,7 @@ user-invocable: false
 
 # 02 · 인증 & 보안 (Auth & Security)
 
-`docs/auth.md` 명세를 코드로 구현할 때의 구체적 패턴을 정의한다.
+`docs/domain/auth.md` 명세를 코드로 구현할 때의 구체적 패턴을 정의한다.
 
 ---
 

@@ -20,7 +20,7 @@
 
 ### 수정된 문서 (Rule 14)
 
-- `docs/orders.md` § 배송비 정책
+- `docs/domain/orders.md` § 배송비 정책
   - 표 "주문 금액 **50,000원 이상** → 무료" → "주문 금액 **70,000원 이상** → 무료" 갱신
 
 ---
@@ -47,7 +47,7 @@
 
 ### 생성된 문서 (Rule 14)
 
-- `docs/cart.md` (신규)
+- `docs/domain/cart.md` (신규)
   - § 1. 데이터 구조: CartItem 스키마 기술
   - § 2. 비즈니스 정책: 중복 추가 시 수량 합산, 가격 스냅샷, 재고 제한
   - § 3. API 엔드포인트: 5개 엔드포인트 기술
@@ -69,7 +69,7 @@
 
 ### 수정된 문서 (Rule 14)
 
-- `docs/points.md` § 포인트 적립 정책 > 구매 적립
+- `docs/domain/points.md` § 포인트 적립 정책 > 구매 적립
   - "결제 금액의 **1%**" → "결제 금액의 **2%**" 갱신
   - 계산식 예시 수치 갱신: `Math.floor(payment.amount * 0.02)`
 
@@ -94,9 +94,9 @@
 
 // ❌ 나쁜 보고 — 문서 갱신 했지만 보고 안 함
 코드 수정 완료.
-(docs/orders.md는 수정했지만 보고에 포함 안 함)
+(docs/domain/orders.md는 수정했지만 보고에 포함 안 함)
 
 // ✅ 좋은 보고
 코드: constants.js SHIPPING_FREE_THRESHOLD 50000 → 70000
-문서: docs/orders.md § 배송비 정책 표 갱신
+문서: docs/domain/orders.md § 배송비 정책 표 갱신
 ```

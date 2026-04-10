@@ -27,13 +27,14 @@ CLAUDE.md Rules 12~14의 구체적 실행 방법을 정의한다.
 
 | 변경 내용 | 갱신 대상 |
 |---|---|
-| 주문 상태값 추가/변경 (`ORDER_STATUS`) | `docs/orders.md` § 주문 상태값 |
-| 배송비 정책 변경 (`SHIPPING_FREE_THRESHOLD`, `SHIPPING_FEE`) | `docs/orders.md` § 배송비 정책 |
-| 포인트 적립율 변경 (`POINT_EARN_RATE`) | `docs/points.md` § 포인트 적립 정책 |
-| 리뷰 포인트 변경 (`REVIEW_POINT_TEXT`, `REVIEW_POINT_PHOTO`) | `docs/points.md`, `docs/reviews.md` |
-| 상품 카테고리 추가/변경 (`CATEGORY_LABEL`) | `docs/products.md` § 카테고리 목록 |
+| 주문 상태값 추가/변경 (`ORDER_STATUS`) | `docs/domain/orders.md` § 주문 상태값 |
+| 배송비 정책 변경 (`SHIPPING_FREE_THRESHOLD`, `SHIPPING_FEE`) | `docs/domain/orders.md` § 배송비 정책 |
+| 포인트 적립율 변경 (`POINT_EARN_RATE`) | `docs/domain/points.md` § 포인트 적립 정책 |
+| 리뷰 포인트 변경 (`REVIEW_POINT_TEXT`, `REVIEW_POINT_PHOTO`) | `docs/domain/points.md`, `docs/domain/reviews.md` |
+| 상품 카테고리 추가/변경 (`CATEGORY_LABEL`) | `docs/domain/products.md` § 카테고리 목록 |
 | API 엔드포인트 추가 (mockBaseQuery 라우트) | 해당 도메인 docs |
-| 신규 도메인 추가 | `docs/{domain}.md` 신규 생성 |
+| 신규 도메인 추가 | `docs/domain/{domain}.md` 신규 생성 |
+| 신규 뷰(레이아웃·복합 페이지) 추가 | `docs/view/{view}.md` 신규 생성 |
 | 비즈니스 규칙 변경 (배송지 최대 수, 리뷰 최소 글자 수 등) | 해당 도메인 docs |
 
 ### 갱신 불필요한 변경
@@ -51,10 +52,11 @@ CLAUDE.md Rules 12~14의 구체적 실행 방법을 정의한다.
 1. CLAUDE.md 전체 확인 (특히 Rules)
    ↓
 2. 관련 docs/*.md 읽기
-   - 주문 관련 → docs/orders.md
-   - 포인트 관련 → docs/points.md
-   - 인증 관련 → docs/auth.md
-   - 신규 도메인 → 전체 docs/ 훑기
+   - 주문 관련 → docs/domain/orders.md
+   - 포인트 관련 → docs/domain/points.md
+   - 인증 관련 → docs/domain/auth.md
+   - 마이페이지 관련 → docs/view/mypage.md
+   - 신규 도메인 → docs/domain/ 전체 훑기
    ↓
 3. 수정할 코드 파일 Read 도구로 읽기
    ↓
@@ -75,7 +77,7 @@ CLAUDE.md Rules 12~14의 구체적 실행 방법을 정의한다.
 - `src/api/mockBaseQuery.js` — 배송비 계산 로직 업데이트
 
 ### 수정된 문서 (Rule 14)
-- `docs/orders.md` § 배송비 정책 — 무료배송 기준 7만원으로 갱신
+- `docs/domain/orders.md` § 배송비 정책 — 무료배송 기준 7만원으로 갱신
 ```
 
 ---

@@ -1,0 +1,18 @@
+## AI 규칙 (전체 작업에 적용)
+
+1. **No Axios** — 네트워크 요청은 RTK Query만.
+2. **Pure JS** — TypeScript 문법 금지.
+3. **No Token Storage** — 토큰을 localStorage·sessionStorage에 저장 금지.
+4. **Vite Env** — `import.meta.env` 사용.
+5. **withReauth** — baseQuery는 반드시 `withReauth`로 감싸기.
+6. **No OAuth Secret** — Client ID·Secret 프론트 코드 포함 금지.
+7. **SPA Nav** — 내부 이동은 `useNavigate`·`Link` 사용.
+8. **Mock 소스** — 새 도메인은 `src/mocks/` + `mockBaseQuery.js` 라우트 등록. 컴포넌트에서 `src/mocks/` 직접 import 금지.
+9. **Mock 변경** — 가변 데이터는 `mockBaseQuery.js` `let` 변수에서만 변경. `src/mocks/` 원본 배열 직접 변경 금지.
+10. **Auto-Doc Sync** — 비즈니스 로직(배송비, 포인트율, 상태값, 카테고리 등) 변경 시 `docs/domain/*.md` 또는 `docs/view/*.md` 자동 갱신 필수.
+11. **Docs First (절대 원칙)** — 코드 한 줄 작성 전에 반드시 관련 docs 파일을 먼저 업데이트한다. 변경의 크기(대·소)와 무관하게 예외 없이 적용. 순서를 어기면 규칙 위반이다:
+    1. 관련 `docs/domain/*.md` 또는 `docs/view/*.md` 읽기 → 명세 파악
+    2. docs 파일 업데이트 또는 신규 생성
+    3. 코딩 시작
+12. **Change Report** — 완료 보고 시 수정된 코드와 문서(`docs/domain/`, `docs/view/`) 변경 내역을 함께 보고.
+13. **New Domain Doc** — 신규 도메인 추가 시 코딩 전에 `docs/domain/{domain}.md`를, 신규 뷰(레이아웃·복합 페이지) 추가 시 `docs/view/{view}.md`를 신규 생성하여 비즈니스 로직을 먼저 정의할 것. 기존 docs 업데이트만으로는 불충분.

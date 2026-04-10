@@ -130,10 +130,10 @@ if (productReviewsMatch && method === 'GET') { ... }
 
 1. `src/mocks/{domain}.js` — 원본 데이터 정의
 2. `mockBaseQuery.js` — import 추가 + 가변이면 let 변수 추가 + 라우트 블록 추가
-3. `src/api/{domain}Api.js` — `injectEndpoints`로 엔드포인트 정의
+3. `src/features/{domain}/{domain}Api.js` — `injectEndpoints`로 엔드포인트 정의
 4. `src/api/apiSlice.js` — tagTypes에 새 타입 추가
 5. `src/app/store.js` — import 추가
-6. `docs/{domain}.md` — 비즈니스 명세 작성 (Rule 12 필수)
+6. `docs/{domain}.md` — 비즈니스 명세 작성 (Rule 13 필수)
 
 ---
 
