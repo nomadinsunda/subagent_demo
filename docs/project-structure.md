@@ -43,3 +43,4 @@ docs/
 └── view/                   레이아웃·복합 페이지 명세
     └── mypage.md
 ```
+→ 전체 구조 설명: `.claude/skills/06-app-structure/`
