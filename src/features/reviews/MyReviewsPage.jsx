@@ -1,21 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGetMyReviewsQuery, useDeleteReviewMutation, useUpdateReviewMutation } from './reviewsApi'
+import ReviewItem, { StarRating } from './components/ReviewItem'
 import Spinner from '../../shared/components/Spinner'
 import ErrorState from '../../shared/components/ErrorState'
 import Toast from '../../shared/components/Toast'
 import { useToast } from '../../shared/hooks/useToast'
-import { formatDate } from '../../shared/utils/formatters'
-
-function StarRating({ rating }) {
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <span key={n} className={`text-sm ${n <= rating ? 'text-yellow-400' : 'text-base-content/20'}`}>★</span>
-      ))}
-    </div>
-  )
-}
 
 function StarRatingInput({ value, onChange }) {
   return (
@@ -52,22 +42,26 @@ export default function MyReviewsPage() {
   const handleEditSubmit = async (e, productId) => {
     e.preventDefault()
     if (editForm.content.length < 10) {
-      setEditError('내용을 10자 이상 입력해주세요')
+      setEditError('최소 10자 이상 입력해 주세요.')
       return
     }
     setEditError('')
     const result = await updateReview({ id: editingId, productId, ...editForm })
     if (result.error) {
-      toast('리뷰 수정에 실패했습니다', 'error')
+      toast('리뷰 수정에 실패했습니다.', 'error')
     } else {
       setEditingId(null)
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!confirm('리뷰를 삭제하시겠습니까?')) return
-    const result = await deleteReview(id)
-    if (result.error) toast('리뷰 삭제에 실패했습니다', 'error')
+  const handleDelete = async (id, productId) => {
+    if (!confirm('리뷰를 정말 삭제하시겠습니까? 삭제 후 복구가 불가능합니다.')) return
+    const result = await deleteReview({ id, productId })
+    if (result.error) {
+      toast('리뷰를 삭제할 수 없습니다.', 'error')
+    } else {
+      toast('리뷰가 삭제되었습니다.', 'success')
+    }
   }
 
   if (isLoading) return <Spinner />
@@ -97,7 +91,7 @@ export default function MyReviewsPage() {
           {reviews.map((review) => (
             <div key={review.id} className="bg-base-100 border border-base-200 rounded-xl overflow-hidden">
               {editingId === review.id ? (
-                // 수정 폼
+                // ── 수정 폼 ─────────────────────────────────────────────────
                 <form onSubmit={(e) => handleEditSubmit(e, review.productId)} className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium">평점</span>
@@ -106,17 +100,21 @@ export default function MyReviewsPage() {
                       onChange={(n) => setEditForm((f) => ({ ...f, rating: n }))}
                     />
                   </div>
-                  <textarea
-                    className={`textarea textarea-bordered w-full text-sm resize-none ${editError ? 'textarea-error' : ''}`}
-                    rows={4}
-                    placeholder="리뷰 내용을 입력해주세요 (최소 10자)"
-                    value={editForm.content}
-                    onChange={(e) => {
-                      setEditForm((f) => ({ ...f, content: e.target.value }))
-                      if (editError) setEditError('')
-                    }}
-                  />
-                  {editError && <p className="text-error text-xs">{editError}</p>}
+                  <div>
+                    <textarea
+                      className={`textarea textarea-bordered w-full text-sm resize-none ${editError ? 'textarea-error' : ''}`}
+                      rows={4}
+                      placeholder="리뷰 내용을 입력해주세요 (최소 10자)"
+                      value={editForm.content}
+                      onChange={(e) => {
+                        setEditForm((f) => ({ ...f, content: e.target.value }))
+                        if (editError) setEditError('')
+                      }}
+                    />
+                    {editError && (
+                      <p className="label-text-alt text-error mt-1">{editError}</p>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <button type="submit" className="btn btn-primary btn-sm" disabled={isUpdating}>
                       {isUpdating ? <span className="loading loading-spinner loading-xs" /> : '저장'}
@@ -127,14 +125,11 @@ export default function MyReviewsPage() {
                   </div>
                 </form>
               ) : (
-                // 리뷰 카드
-                <>
-                  {/* 메타 행: 별점 + 날짜 + 액션 버튼 */}
-                  <div className="px-4 pt-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <StarRating rating={review.rating} />
-                      <span className="text-xs text-base-content/50">{formatDate(review.createdAt)}</span>
-                    </div>
+                // ── 리뷰 카드 ────────────────────────────────────────────────
+                <div className="px-4 pt-3 pb-1">
+                  {/* 별점 + 날짜 (ReviewItem의 아바타 대신 단순 헤더) */}
+                  <div className="flex items-center justify-between mb-2">
+                    <StarRating rating={review.rating} />
                     <div className="flex gap-1">
                       <button
                         className="btn btn-ghost btn-xs text-base-content/50 hover:text-primary"
@@ -144,39 +139,28 @@ export default function MyReviewsPage() {
                       </button>
                       <button
                         className="btn btn-ghost btn-xs text-base-content/50 hover:text-error"
-                        onClick={() => handleDelete(review.id)}
+                        onClick={() => handleDelete(review.id, review.productId)}
                       >
                         삭제
                       </button>
                     </div>
                   </div>
 
-                  {/* 상품 정보 박스 */}
-                  <div className="mx-4 mt-2 px-3 py-2 bg-base-200 rounded-lg">
-                    <Link
-                      to={`/products/${review.productId}`}
-                      className="text-xs text-base-content/70 hover:text-primary transition-colors"
-                    >
-                      상품 #{review.productId} 보러가기 →
-                    </Link>
-                  </div>
-
-                  {/* 리뷰 본문 */}
-                  <p className="px-4 py-3 text-sm leading-relaxed text-base-content/80">
-                    {review.content}
-                  </p>
-
-                  {/* 리뷰 이미지 */}
-                  {review.imageUrl && (
-                    <div className="px-4 pb-4">
-                      <img
-                        src={review.imageUrl}
-                        alt="리뷰 이미지"
-                        className="w-24 h-24 object-cover rounded-lg border border-base-200"
-                      />
-                    </div>
-                  )}
-                </>
+                  {/* ReviewItem: 공통 카드 (아바타·태그·본문·이미지) */}
+                  <ReviewItem
+                    review={review}
+                    actions={
+                      <div className="mt-1 mb-2 px-3 py-2 bg-base-200 rounded-lg">
+                        <Link
+                          to={`/products/${review.productId}`}
+                          className="text-xs text-base-content/70 hover:text-primary transition-colors"
+                        >
+                          상품 #{review.productId} 보러가기 →
+                        </Link>
+                      </div>
+                    }
+                  />
+                </div>
               )}
             </div>
           ))}

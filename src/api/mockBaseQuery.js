@@ -71,13 +71,35 @@ const handleRequest = ({ url, method = 'GET', body, params }) => {
     return ok({ ...product, reviewCount: productReviews.length, averageRating })
   }
 
+  const productReviewsSummaryMatch = url.match(/^\/products\/(\d+)\/reviews\/summary$/)
+  if (productReviewsSummaryMatch && method === 'GET') {
+    const productId = Number(productReviewsSummaryMatch[1])
+    const productRevs = reviews.filter((r) => r.productId === productId)
+    const totalCount = productRevs.length
+    const averageRating = totalCount
+      ? Number((productRevs.reduce((s, r) => s + r.rating, 0) / totalCount).toFixed(1))
+      : 0
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    productRevs.forEach((r) => { ratingDistribution[r.rating] = (ratingDistribution[r.rating] || 0) + 1 })
+    return ok({ averageRating, totalCount, ratingDistribution })
+  }
+
   const productReviewsMatch = url.match(/^\/products\/(\d+)\/reviews$/)
   if (productReviewsMatch && method === 'GET') {
     const productId = Number(productReviewsMatch[1])
     let result = reviews.filter((r) => r.productId === productId)
-    if (params?.sort === 'highest') result.sort((a, b) => b.rating - a.rating)
-    if (params?.sort === 'lowest') result.sort((a, b) => a.rating - b.rating)
-    return ok(result)
+    if (params?.hasImage === 'true' || params?.hasImage === true) {
+      result = result.filter((r) => r.images && r.images.length > 0)
+    }
+    if (params?.sort === 'newest') result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    else if (params?.sort === 'highest') result.sort((a, b) => b.rating - a.rating)
+    else if (params?.sort === 'lowest') result.sort((a, b) => a.rating - b.rating)
+    else result.sort((a, b) => b.helpfulCount - a.helpfulCount) // 'best' 기본값 (도움순)
+    const total = result.length
+    const page = Number(params?.page) || 1
+    const limit = Number(params?.limit) || 10
+    result = result.slice((page - 1) * limit, page * limit)
+    return ok({ reviews: result, total, page, limit })
   }
 
   const productInquiriesMatch = url.match(/^\/products\/(\d+)\/inquiries$/)
@@ -184,6 +206,22 @@ const handleRequest = ({ url, method = 'GET', body, params }) => {
     if (!reviews.find((r) => r.id === id)) return fail(404, '리뷰를 찾을 수 없습니다')
     reviews = reviews.filter((r) => r.id !== id)
     return ok({ message: '리뷰가 삭제되었습니다' })
+  }
+
+  const reviewHelpfulMatch = url.match(/^\/reviews\/(\d+)\/helpful$/)
+  if (reviewHelpfulMatch && method === 'POST') {
+    if (!isLoggedIn) return fail(401, '인증이 필요합니다')
+    const id = Number(reviewHelpfulMatch[1])
+    const idx = reviews.findIndex((r) => r.id === id)
+    if (idx === -1) return fail(404, '리뷰를 찾을 수 없습니다')
+    if (reviews[idx].isMyReview) return fail(400, '본인 리뷰에는 도움돼요를 누를 수 없습니다')
+    const next = !reviews[idx].isHelpful
+    reviews = reviews.map((r, i) =>
+      i === idx
+        ? { ...r, isHelpful: next, helpfulCount: next ? r.helpfulCount + 1 : Math.max(0, r.helpfulCount - 1) }
+        : r
+    )
+    return ok(reviews[idx])
   }
 
   // ── Points ────────────────────────────────────────────────────────────────

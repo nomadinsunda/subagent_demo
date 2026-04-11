@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGetProductQuery } from './productsApi'
-import { useGetProductReviewsQuery } from '../reviews/reviewsApi'
 import { useGetProductInquiriesQuery, useCreateInquiryMutation } from '../inquiries/inquiriesApi'
 import ProductReviewSection from './components/ProductReviewSection'
 import { useAddToCartMutation } from '../cart/cartApi'
@@ -25,7 +24,6 @@ export default function ProductDetailPage() {
   const { toasts, toast } = useToast()
 
   const { data: product, isLoading, isError, refetch } = useGetProductQuery(id)
-  const { data: reviews = [] } = useGetProductReviewsQuery({ productId: id })
   const { data: inquiries = [] } = useGetProductInquiriesQuery(id)
   const [createInquiry, { isLoading: isSubmitting }] = useCreateInquiryMutation()
   const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation()
@@ -189,7 +187,7 @@ export default function ProductDetailPage() {
             className={`tab ${activeTab === 'reviews' ? 'tab-active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            리뷰 ({reviews.length})
+            리뷰 ({product.reviewCount ?? 0})
           </button>
           <button
             role="tab"
@@ -201,7 +199,7 @@ export default function ProductDetailPage() {
         </div>
 
         {/* 리뷰 탭 */}
-        {activeTab === 'reviews' && <ProductReviewSection reviews={reviews} />}
+        {activeTab === 'reviews' && <ProductReviewSection productId={id} />}
 
         {/* 문의 탭 */}
         {activeTab === 'inquiries' && (
