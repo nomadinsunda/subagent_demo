@@ -6,7 +6,7 @@ export function StarRating({ rating, size = 'sm' }) {
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`${size === 'sm' ? 'text-sm' : 'text-lg'} ${n <= rating ? 'text-yellow-400' : 'text-base-content/20'}`}
+          className={`${size === 'sm' ? 'text-sm' : 'text-lg'} ${n <= rating ? 'text-[#FFBB00]' : 'text-base-content/20'}`}
         >
           ★
         </span>
@@ -42,7 +42,7 @@ export default function ReviewItem({ review, actions }) {
           )}
           <div>
             <p className="text-sm font-medium leading-none" style={{ color: '#111111' }}>{review.userName}</p>
-            <p className="text-xs mt-0.5" style={{ color: '#888888' }}>{formatDate(review.createdAt)}</p>
+            <p className="text-xs mt-0.5" style={{ color: '#555555' }}>{formatDate(review.createdAt)}</p>
           </div>
         </div>
         <StarRating rating={review.rating} />
@@ -59,8 +59,8 @@ export default function ReviewItem({ review, actions }) {
 
       {/* 본문 */}
       <p
-        className="text-sm mb-3"
-        style={{ color: '#333333', lineHeight: 1.6, letterSpacing: '-0.01em' }}
+        className="text-[15px] mb-3"
+        style={{ color: '#333333', lineHeight: 1.65, letterSpacing: '-0.01em' }}
       >
         {review.content}
       </p>

@@ -4,14 +4,14 @@ function RatingBar({ star, count, total }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="w-7 text-right" style={{ color: '#888888' }}>{star}점</span>
+      <span className="w-7 text-right" style={{ color: '#555555' }}>{star}점</span>
       <div className="flex-1 bg-base-300 rounded-full h-1.5 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-300"
           style={{ width: `${pct}%`, backgroundColor: '#FF9900' }}
         />
       </div>
-      <span className="w-5" style={{ color: '#888888' }}>{count}</span>
+      <span className="w-5" style={{ color: '#555555' }}>{count}</span>
     </div>
   )
 }
@@ -52,9 +52,9 @@ export default function ReviewSummary({ summary, isLoading }) {
   return (
     <div className="flex gap-6 p-5 bg-base-200 rounded-2xl">
       <div className="flex flex-col items-center justify-center min-w-[80px] gap-1">
-        <p className="text-3xl font-bold" style={{ color: '#111111' }}>{averageRating}</p>
+        <p className="text-[42px] font-bold leading-none" style={{ color: '#111111' }}>{averageRating}</p>
         <StarRating rating={Math.round(averageRating)} size="base" />
-        <p className="text-xs mt-1" style={{ color: '#888888' }}>리뷰 {totalCount}개</p>
+        <p className="text-xs mt-1" style={{ color: '#555555' }}>리뷰 {totalCount}개</p>
       </div>
       <div className="flex-1 space-y-2 flex flex-col justify-center">
         {[5, 4, 3, 2, 1].map((star) => (

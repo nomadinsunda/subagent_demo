@@ -70,7 +70,7 @@ function Pagination({ page, totalPages, onChange }) {
           <button
             key={p}
             className={`join-item btn btn-sm ${page === p ? 'btn-active' : ''}`}
-            style={page === p ? { borderColor: '#346AFF', color: '#346AFF' } : {}}
+            style={page === p ? { borderColor: '#0073E9', color: '#0073E9' } : {}}
             onClick={() => onChange(p)}
           >
             {p}
@@ -139,7 +139,7 @@ export default function ProductReviewSection({ productId }) {
   // 리뷰가 없는 경우 (summary 로드 완료 후 판단)
   if (!summaryLoading && summary?.totalCount === 0) {
     return (
-      <div className="text-center py-16" style={{ color: '#888888' }}>
+      <div className="text-center py-16" style={{ color: '#555555' }}>
         <p className="text-4xl mb-3">✍️</p>
         <p className="font-medium mb-1" style={{ color: '#333333' }}>아직 리뷰가 없습니다</p>
         <p className="text-sm">구매 후 첫 번째 리뷰를 남겨보세요!</p>
@@ -156,7 +156,7 @@ export default function ProductReviewSection({ productId }) {
       {/* Section 2: 포토 리뷰 갤러리 (현재 페이지 기준) */}
       {!listLoading && photoReviews.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-2" style={{ color: '#888888' }}>
+          <p className="text-sm font-medium mb-2" style={{ color: '#555555' }}>
             포토 리뷰
           </p>
           <div className="flex gap-2 overflow-x-auto pb-1">
@@ -181,7 +181,7 @@ export default function ProductReviewSection({ productId }) {
       )}
 
       {/* Section 3: 정렬 탭 + 필터 (Sticky — Header 64px 아래 고정) */}
-      <div className="sticky top-16 z-10 bg-base-100 border-b border-base-200 pb-2 space-y-2">
+      <div className="sticky top-0 z-10 bg-base-100 border-b border-base-200 pb-2 space-y-2">
         <div className="flex border-b border-base-200">
           {SORT_OPTIONS.map((opt) => (
             <button
@@ -192,15 +192,15 @@ export default function ProductReviewSection({ productId }) {
                   ? 'border-[#111111] font-medium'
                   : 'border-transparent hover:text-base-content/70'
               }`}
-              style={{ color: sort === opt.value ? '#111111' : '#888888' }}
+              style={{ color: sort === opt.value ? '#111111' : '#555555' }}
             >
               {opt.label}
             </button>
           ))}
         </div>
         <div className="flex items-center justify-between px-1">
-          <p className="text-xs" style={{ color: '#888888' }}>총 {total}개</p>
-          <label className="flex items-center gap-1.5 cursor-pointer text-xs" style={{ color: '#888888' }}>
+          <p className="text-xs" style={{ color: '#555555' }}>총 {total}개</p>
+          <label className="flex items-center gap-1.5 cursor-pointer text-xs" style={{ color: '#555555' }}>
             <input
               type="checkbox"
               className="checkbox checkbox-xs"
@@ -216,7 +216,7 @@ export default function ProductReviewSection({ productId }) {
       {listLoading ? (
         <ReviewListSkeleton />
       ) : reviews.length === 0 ? (
-        <div className="text-center py-12" style={{ color: '#888888' }}>
+        <div className="text-center py-12" style={{ color: '#555555' }}>
           <p>해당 조건의 리뷰가 없습니다.</p>
         </div>
       ) : (
@@ -232,8 +232,8 @@ export default function ProductReviewSection({ productId }) {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors"
                     style={
                       review.isHelpful
-                        ? { borderColor: '#346AFF', color: '#346AFF', backgroundColor: 'rgba(52,106,255,0.05)' }
-                        : { borderColor: '#E5E7EB', color: '#888888' }
+                        ? { borderColor: '#0073E9', color: '#0073E9', backgroundColor: 'rgba(0,115,233,0.05)' }
+                        : { borderColor: '#E5E7EB', color: '#555555' }
                     }
                   >
                     👍 도움이 돼요{review.helpfulCount > 0 ? ` (${review.helpfulCount})` : ''}

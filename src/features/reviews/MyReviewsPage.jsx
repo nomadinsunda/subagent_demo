@@ -15,7 +15,7 @@ function StarRatingInput({ value, onChange }) {
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className={`text-xl transition-colors ${n <= value ? 'text-yellow-400' : 'text-base-content/20'} hover:text-yellow-400`}
+          className={`text-xl transition-colors ${n <= value ? 'text-[#FFBB00]' : 'text-base-content/20'} hover:text-[#FFBB00]`}
         >
           ★
         </button>

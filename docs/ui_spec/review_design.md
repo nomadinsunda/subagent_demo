@@ -1,162 +1,355 @@
-# 리뷰 페이지 디자인 명세
+## 🛠️ Layout & CSS Hard-coded Spec
 
-참고 이미지: `docs/images/cupang_review.png`
-
----
-
-## 1. 디자인 시스템 (Global System)
-
-| 항목 | 값 |
-|---|---|
-| Primary (CTA·하이라이트) | `#346AFF` |
-| Heading | `#111111` |
-| Body Text | `#333333` |
-| Meta / Subtext | `#888888` |
-| Divider | `1px solid #F2F2F2` |
-| Rating Gauge | `#FF9900` |
-| Helpful Active Border | `#E5E7EB` → active: `#346AFF` |
-
-**Typography**
-- 기본 서체: Pretendard / Noto Sans KR
-- 본문: `font-size: 14px`, `line-height: 1.6`, `letter-spacing: -0.01em`
-- 메타(작성자·날짜): `font-size: 12px`, `color: #888888`
+### 1. Global Layout (Layout System)
+* **Container Width:** `1024px`
+* **Column Gap (Summary Section):** `48px`
+* **Vertical Section Margin:** `40px` (섹션 간 큰 구분선 기준)
+* **Responsive Breakpoint:** `768px` (이하에서 1단 컬럼 스택)
 
 ---
 
-## 2. 페이지 구조 (Section 순서)
+### 2. CSS Design Tokens (Computed Values)
 
-`ProductReviewSection` 컴포넌트 내 렌더링 순서. 전체 좌우 여백은 부모 컨테이너의 `px-4`(16px)를 따른다.
+```css
+:root {
+  /* Colors */
+  --color-primary: #0073E9;      /* 쿠팡 블루 */
+  --color-star: #FFBB00;         /* 별점 노랑 */
+  --color-text-main: #111111;    /* 기본 텍스트 */
+  --color-text-sub: #555555;     /* 보조/메타 정보 */
+  --color-border-light: #EEEEEE; /* 일반 구분선 */
+  --color-bg-gray: #FAFAFA;      /* 필터 바 배경 */
 
-```
-Section 1  별점 요약 (ReviewSummary)
-Section 2  포토 리뷰 갤러리
-Section 3  정렬 탭 + 필터  ← Sticky
-Section 4  리뷰 목록 (ReviewItem 반복)
-Section 5  페이지네이션
+  /* Typography */
+  --font-size-score: 42px;       /* 총점 숫자 */
+  --font-size-title: 20px;       /* 섹션 타이틀 */
+  --font-size-body: 14px;        /* 리뷰 본문 */
+  --font-size-meta: 12px;        /* 날짜, 옵션 정보 */
+
+  /* Spacing */
+  --spacing-section: 2.5rem;     /* 40px */
+  --spacing-card-py: 1.5rem;     /* 24px */
+}
 ```
 
 ---
 
-## 3. Section별 상세 명세
+### 3. Core Component Layout Specs
 
-### [Section 1] 별점 요약 (ReviewSummary)
+#### A. Review Summary Dashboard (상단 요약)
+좌측 총점과 우측 그래프의 비율은 **1:2** 입니다.
+```css
+/* Layout 구조 */
+.summary-container {
+  display: flex;
+  align-items: center;
+  padding: 32px 24px;
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  gap: 48px;
+}
 
-**레이아웃: 1:2 수평 분할**
-
+/* 별점 그래프 막대 */
+.rating-bar-bg {
+  width: 140px;
+  height: 8px;
+  background-color: #F0F0F0;
+  border-radius: 4px;
+}
+.rating-bar-fill {
+  height: 100%;
+  background-color: #333333;
+  border-radius: 4px;
+}
 ```
-┌─────────────┬──────────────────────────────┐
-│  평균 평점   │  별점 분포 바 (5→1점 순)     │
-│  (1 비율)   │  (2 비율)                    │
-└─────────────┴──────────────────────────────┘
+
+**로딩 상태:** 숫자·별·바 영역 개별 스켈레톤 (`animate-pulse`) 표시. 데이터 로드 완료 전까지 Summary 전체를 스켈레톤으로 대체.
+
+---
+
+#### B. Filter Bar (Sticky)
+스크롤 시 상단에 붙는 영역입니다.
+```css
+.filter-bar {
+  position: sticky;
+  top: 0; /* 네비게이션이 있다면 그 높이만큼 offset */
+  height: 56px;
+  background: #FFFFFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  z-index: 10;
+}
 ```
 
-- **평균 평점 영역** (`min-w-[80px]`, 중앙 정렬)
-  - 숫자: `text-3xl font-bold`, `color: #111111`
-  - 별: `StarRating` 컴포넌트, 소수점 반올림 후 표시
-  - 총 개수: `text-xs`, `color: #888888`
-- **분포 바 영역** (`flex-1`)
-  - 5점 → 1점 순서로 배치
-  - 게이지 색상: `#FF9900`, 배경: `bg-base-300`
-  - 높이: `h-1.5`, `border-radius: 9999px`
-  - 퍼센트 계산: `Math.round((count / totalCount) * 100)`
-- **로딩 상태**: 스켈레톤 UI (`animate-pulse`) — 숫자·별·바 영역 개별 플레이스홀더
+**정렬 탭 (4개 고정)**
 
-### [Section 2] 포토 리뷰 갤러리
-
-- **데이터 소스**: 현재 페이지(`page`) 응답 리뷰 중 `images.length > 0`인 항목 (전체 리뷰 대상 아님)
-  - 이유: 별도 API 호출 없이 기존 쿼리 캐시 재사용
-  - 페이지 이동 시 갤러리도 해당 페이지 이미지로 갱신됨
-- **표시 개수**: 최대 6개. 6번째 이미지에 `+N` 오버레이 (`bg-black/40`)
-- **이미지 스타일**: `w-20 h-20 object-cover rounded-lg border border-base-200 aspect-square`
-- **스크롤**: `overflow-x-auto` (모바일 가로 스크롤 허용)
-- **조건부 렌더링**: 현재 페이지에 포토 리뷰가 없으면 섹션 전체 숨김
-
-### [Section 3] 정렬 탭 + 필터 — **Sticky (필수)**
-
-**Sticky 스펙**
-- 위치: `sticky top-16 z-10` — Header 높이 64px(`h-16`) 바로 아래 고정
-- 배경: `bg-base-100` — 스크롤 시 리뷰 카드 텍스트 은폐
-- 하단 구분선: `border-b border-base-200`
-- z-index: `z-10` (Header `z-50`보다 낮게)
-
-**정렬 탭**
-
-| 값 | 레이블 | 서버 정렬 기준 |
+| 탭 레이블 | `sort` 값 | 서버 정렬 기준 |
 |---|---|---|
-| `best` | 베스트순 (기본) | `helpfulCount` 내림차순 |
-| `newest` | 최신순 | `createdAt` 내림차순 |
-| `highest` | 별점 높은순 | `rating` 내림차순 |
-| `lowest` | 별점 낮은순 | `rating` 오름차순 |
+| 베스트순 (기본) | `best` | `helpfulCount` 내림차순 |
+| 최신순 | `newest` | `createdAt` 내림차순 |
+| 별점 높은순 | `highest` | `rating` 내림차순 |
+| 별점 낮은순 | `lowest` | `rating` 오름차순 |
 
-- 선택된 탭: `border-b-2 border-[#111111] font-medium color: #111111`
-- 비선택 탭: `border-transparent color: #888888`
-- 탭 전환 시 `page → 1` reset 필수
-
-**포토 리뷰 필터**
-- 우측 정렬 체크박스. 체크 시 `hasImage: true` 파라미터 서버 전송
-- 변경 시 `page → 1` reset 필수
-- 총 개수(`total`) 좌측 표시: `text-xs color: #888888`
-
-### [Section 4] 리뷰 목록 (ReviewItem)
-
-**ReviewItem 구조** (`src/features/reviews/components/ReviewItem.jsx`)
-
-```
-┌─ 아바타(8×8) ─ 작성자명 / 날짜 ─────── 별점 ─┐
-│ 키워드 태그 (badge-ghost, 선택 표시)           │
-│ 본문 (14px, #333333, line-height 1.6)          │
-│ 이미지 썸네일 (최대 5장, w-20 h-20)            │
-│ [actions 슬롯]                                 │
-└────────────────────────────────────────────────┘
+```css
+/* 탭 기본 */
+.sort-tab {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+  color: #888888;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+/* 탭 활성 */
+.sort-tab.active {
+  border-bottom-color: #111111;
+  color: #111111;
+  font-weight: 500;
+}
 ```
 
-- **아바타**: `profileImage` 있으면 `<img>`, 없으면 이름 첫 글자 이니셜 원형
-- **작성자명**: 마스킹 처리된 값 (서버 응답 그대로 표시 — 예: `홍*동`)
-- **actions 슬롯**: 컨텍스트별 외부 주입
-  - `ProductReviewSection`: 도움돼요 버튼 (`isMyReview: true`이면 미표시)
-  - `MyReviewsPage`: 상품 링크 + 수정/삭제 버튼
+**포토 리뷰 필터 (우측)**
+```css
+.filter-photo-only {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #888888;
+  cursor: pointer;
+}
+```
+- 체크 시 `hasImage: true` 파라미터 서버 전송
+- 탭 전환 또는 필터 변경 시 `page → 1` reset 필수
+
+---
+
+#### C. Review List Item (개별 리뷰)
+```css
+.review-item {
+  padding: 24px 0;
+  border-bottom: 1px solid #F4F4F4;
+}
+
+.user-profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.review-content {
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #333333;
+  word-break: break-all;
+}
+
+.photo-attachment-grid {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+}
+.photo-item {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+```
+
+**이미지 제한:** `images` 배열 최대 **5장**까지 표시 (`images.slice(0, 5)`). 초과분 미표시.
 
 **도움돼요 버튼**
-- 기본: `border: 1px solid #E5E7EB`, `color: #888888`
-- 활성(`isHelpful: true`): `border-color: #346AFF`, `color: #346AFF`, `background: rgba(52,106,255,0.05)`
-- 카운트 표시: `helpfulCount > 0`일 때 `(N)` 병기
-- **Optimistic Update**: 클릭 즉시 `isHelpful` 반전 + `helpfulCount` ±1. 서버 실패 시 `patch.undo()`로 롤백
+```css
+/* 기본 상태 */
+.helpful-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  border: 1px solid #E5E7EB;
+  color: #888888;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+/* 활성 상태 (isHelpful: true) */
+.helpful-btn.active {
+  border-color: #346AFF;
+  color: #346AFF;
+  background-color: rgba(52, 106, 255, 0.05);
+}
+```
 
-**로딩·상태**
-- 초기 로딩: 스켈레톤 5행 (`animate-pulse`)
-- 페이지 전환 중(`isFetching`): 목록 `opacity-50 pointer-events-none`
-- 결과 없음: "해당 조건의 리뷰가 없습니다." 텍스트
+- `isMyReview: true`이면 버튼 **미표시**
+- `helpfulCount > 0`일 때만 카운트 숫자 병기 — 예: `👍 도움이 돼요 (12)`
+- **Optimistic Update:** 클릭 즉시 `isHelpful` 반전 + `helpfulCount` ±1. 서버 실패 시 `patch.undo()`로 원복
 
-### [Section 5] 페이지네이션
-
-- 중앙 정렬, `join` 컴포넌트 사용
-- **최대 버튼 수**: 7개 (totalPages ≤ 7이면 전부, 초과 시 슬라이딩 윈도우)
-- **슬라이딩 윈도우 알고리즘**:
-  - `page ≤ 4`: 1~7 표시
-  - `page ≥ totalPages - 3`: `(totalPages-6)~totalPages` 표시
-  - 그 외: `(page-3)~(page+3)` 표시
-- 이전/다음: `‹` `›` 문자 (아이콘 대체), 끝에서 `disabled`
-- 활성 페이지: `btn-active`, `border-color: #346AFF`, `color: #346AFF`
-- `totalPages ≤ 1`이면 미표시
+**로딩·전환 상태**
+```css
+/* 초기 로딩: 스켈레톤 5행 */
+.skeleton-row {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: #F0F0F0;
+  border-radius: 4px;
+}
+/* 페이지 전환 중 (isFetching) */
+.list-fetching {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+```
 
 ---
 
-## 4. 컴포넌트 파일 위치
+#### D. Photo Review Gallery (포토 리뷰 갤러리)
+
+**데이터 소스:** 현재 페이지(`page`) 응답 리뷰 중 `images.length > 0`인 항목.
+별도 API 호출 없이 기존 쿼리 캐시를 재사용하며, 페이지 이동 시 해당 페이지 이미지로 갱신됨.
+
+```css
+.photo-gallery {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;           /* 모바일 가로 스크롤 허용 */
+  padding-bottom: 4px;        /* 스크롤바 공간 확보 */
+}
+.photo-gallery-item {
+  position: relative;
+  flex-shrink: 0;             /* 가로 스크롤 시 이미지 축소 방지 */
+  width: 80px;
+  height: 80px;
+}
+.photo-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  aspect-ratio: 1 / 1;
+}
+/* 6번째 이미지 +N 오버레이 */
+.photo-gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+}
+```
+
+**표시 조건**
+- 최대 **6개** 표시
+- 7개 이상이면 6번째에 `+N` 오버레이 (N = 전체 포토 리뷰 수 − 6)
+- 현재 페이지에 포토 리뷰가 없으면 갤러리 섹션 **전체 미표시**
+
+---
+
+#### E. Pagination (페이지네이션)
+
+```css
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+.page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: 1px solid #EEEEEE;
+  font-size: 14px;
+  color: #333333;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+/* 현재 페이지 */
+.page-btn.active {
+  border-color: #346AFF;
+  color: #346AFF;
+}
+/* 이전/다음 화살표 */
+.page-btn.nav {
+  font-size: 18px;
+  color: #555555;
+}
+.page-btn:disabled {
+  color: #CCCCCC;
+  border-color: #EEEEEE;
+  cursor: not-allowed;
+}
+```
+
+**슬라이딩 윈도우 알고리즘** (최대 7개 버튼)
+
+| 조건 | 표시 범위 |
+|---|---|
+| `totalPages ≤ 7` | 전체 페이지 모두 표시 |
+| `page ≤ 4` | 1 ~ 7 |
+| `page ≥ totalPages − 3` | (totalPages−6) ~ totalPages |
+| 그 외 | (page−3) ~ (page+3) |
+
+- 이전/다음 버튼: `‹` `›` 문자 사용 (텍스트 아이콘)
+- `page === 1`이면 이전 버튼 `disabled`
+- `page === totalPages`이면 다음 버튼 `disabled`
+- `totalPages ≤ 1`이면 페이지네이션 전체 **미표시**
+
+---
+
+### 4. Empty State
+
+| 조건 | 이모지 | 제목 | 설명 |
+|---|---|---|---|
+| `summary.totalCount === 0` | ✍️ | 아직 리뷰가 없습니다 | 구매 후 첫 번째 리뷰를 남겨보세요! |
+| 필터 결과 없음 | — | — | 해당 조건의 리뷰가 없습니다. |
+
+```css
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 0;
+  color: #888888;
+  text-align: center;
+}
+.empty-state .emoji {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.empty-state .title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 4px;
+}
+.empty-state .desc {
+  font-size: 14px;
+  color: #888888;
+}
+```
+
+---
+
+### 5. 컴포넌트 파일 위치
 
 ```
 src/features/reviews/components/
-├── ReviewItem.jsx      공통 카드 (StarRating named export 포함)
-└── ReviewSummary.jsx   별점 요약 + 분포 바
+├── ReviewItem.jsx      공통 리뷰 카드 (StarRating named export 포함)
+└── ReviewSummary.jsx   별점 요약 + 분포 바 (A 항목)
 
 src/features/products/components/
-└── ProductReviewSection.jsx   상품 상세용 조립 컴포넌트 (자립형)
+└── ProductReviewSection.jsx   B~E 섹션 조립 컴포넌트 (자립형, productId prop만 수신)
 ```
-
----
-
-## 5. Empty State
-
-| 상황 | 문구 | 비고 |
-|---|---|---|
-| 리뷰 0개 (summary.totalCount === 0) | "아직 리뷰가 없습니다 / 구매 후 첫 번째 리뷰를 남겨보세요!" | 이모지 `✍️` |
-| 필터 결과 없음 | "해당 조건의 리뷰가 없습니다." | 필터 초기화 버튼 없음 |

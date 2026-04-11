@@ -12,17 +12,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **멍샵** — React 19 기반 애견 쇼핑몰 SPA. **Feature-based Design** 기반 프로젝트 구현. 현재 **백엔드 없는 Mock 개발 단계**.
 
-## 기술 스택
 
-| 영역 | 기술 |
-|---|---|
-| UI | React 19.2.4+, JavaScript (JSX) — **TypeScript 금지** |
-| 번들러 | Vite 8.0.1+ (`@tailwindcss/vite`) |
-| 상태 | Redux Toolkit 2.11.2+ + RTK Query |
-| 스타일 | Tailwind CSS v4 + daisyUI v5 |
-| 라우팅 | React Router DOM v7 |
-| HTTP | RTK Query 전용 — **Axios 금지** |
-| 환경변수 | `import.meta.env.VITE_*` — **process.env 금지** |
+## 🛠 Tech Stack & Environment
+- **Core:** React 19.2.4+, JavaScript (JSX)
+- **Bundler & Tooling (devDependencies):**
+    * **Vite 8.0.1+** (`@vitejs/plugin-react` 6.0.1+)
+    * **ESLint 9.39.4+** (`@eslint/js` 9.39.4, `eslint-plugin-react-hooks` 7.0.1, `eslint-plugin-react-refresh` 0.5.2)
+    * **Globals 17.4.0+**
+    * **Type Definitions:** `@types/react` 19.2.14, `@types/react-dom` 19.2.3 (개발 환경 지원용)
+- **State Management:**
+    * **Redux Toolkit 2.11.2+ (RTK)**
+    * **RTK Query:** Server Data Fetching & Caching (`fetchBaseQuery`)
+- **Styling:** **Tailwind CSS v4** & **daisyUI v5**
+- **Network:** **No Axios**. Native `fetch` (via RTK Query) 전용.
+- **Environment:** `import.meta.env.VITE_API_URL` 사용.
 
 ## 현재 개발 모드: Mock
 
